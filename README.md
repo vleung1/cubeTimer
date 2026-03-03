@@ -9,8 +9,8 @@ Cube Timer is a simple, intuitive iOS application built with SwiftUI designed fo
 - **Progress Chart**: Visualize your improvement over time with a dynamic line chart (built with Swift Charts).
 - **Dark/Light Theme Toggle**: Switch between system, light, and dark modes directly within the app.
 - **Haptic & Sound Feedback**: Tactile and audible feedback when starting and stopping the timer (can be toggled in settings).
-- **CSV Export**: Export your entire solve history to a CSV file.
-- **Share Best Time**: Generate and share a "New Best Time!" card image.
+- **CSV Export**: Export your entire solve history to a formatted CSV file via the Settings menu.
+- **Share Best Time**: Generate and share a "New Best Time!" card image directly from the main screen.
 - **History Tracking**: Keeps a history of your past solves, displaying the last 10 solves on the main screen.
 - **Solve Management**: View your entire solve history in a separate list, with the ability to delete individual solves or reset all data.
 - **Persistent Storage**: All your solves, statistics, theme preferences, and feedback settings are saved automatically.
@@ -18,7 +18,7 @@ Cube Timer is a simple, intuitive iOS application built with SwiftUI designed fo
 
 ## Requirements
 
-- iOS 15.0 or later (depending on Xcode settings)
+- iOS 16.0 or later (required for Swift Charts and ImageRenderer)
 - Xcode 14 or later to compile and install
 
 ## Installation
@@ -43,6 +43,8 @@ Cube Timer is a simple, intuitive iOS application built with SwiftUI designed fo
 - Tap the **STOP** button to end the timer and record your solve.
 - Your statistics (**Best Time**, Overall Avg, and Last 10 Avg) will automatically update.
 - Use the **Theme Toggle** (sun/moon icon) in the top left to switch between light, dark, and system color schemes.
+- Tap the **Settings** (gear icon) to toggle haptic/sound feedback or **Export your solves as a CSV**.
+- Tap the **Share icon** inside the Best Time card to share a screenshot of your record.
 - Tap **Solves** in the top right corner to view or manage your full solve history.
 - Tap **Reset Timer** if you want to clear the current timer without saving the solve.
 - View your **Progress Chart** on the main screen to see your solve times trending over time.

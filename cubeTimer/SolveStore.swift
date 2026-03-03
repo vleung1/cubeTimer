@@ -57,13 +57,25 @@ class SolveStore: ObservableObject {
     }
 
     func generateCSV() -> String {
-        var csv = "Solve Number,Date,Time\n"
+        var csv = "Solve Number,Date,Formatted Time,Seconds\n"
         let dateFormatter = ISO8601DateFormatter()
         for (index, solve) in solves.reversed().enumerated() {
             let solveNum = solves.count - index
-            csv += "\(solveNum),\(dateFormatter.string(from: solve.date)),\(solve.time)\n"
+            let formatted = formatTime(solve.time)
+            let seconds = String(format: "%.2f", solve.time)
+            csv += "\(solveNum),\(dateFormatter.string(from: solve.date)),\"\(formatted)\",\(seconds)\n"
         }
         return csv
+    }
+
+    private func formatTime(_ time: Double) -> String {
+        let minutes = Int(time) / 60
+        let seconds = Int(time) % 60
+        let centiseconds = Int((time * 100).truncatingRemainder(dividingBy: 100))
+        if minutes > 0 {
+            return String(format: "%d:%02d.%02d", minutes, seconds, centiseconds)
+        }
+        return String(format: "%02d.%02d", seconds, centiseconds)
     }
 
     private func save() {

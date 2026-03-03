@@ -35,11 +35,10 @@ struct ContentView: View {
 
                 // Stats
                 HStack(spacing: 30) {
-                    VStack {
-                        StatView(label: "Best Time", value: store.bestTime)
+                    StatView(label: "Best Time", value: store.bestTime) {
                         if let best = store.bestTime {
                             ShareLink(item: renderBestTime(best), preview: SharePreview("My Best Time", image: renderBestTime(best))) {
-                                Label("Share", systemImage: "square.and.arrow.up")
+                                Image(systemName: "square.and.arrow.up")
                                     .font(.caption2)
                             }
                         }
@@ -150,7 +149,7 @@ struct ContentView: View {
                     .environmentObject(settings)
             }
             .sheet(isPresented: $showSettings) {
-                SettingsView(settings: settings)
+                SettingsView(settings: settings, store: store)
                     .presentationDetents([.medium])
             }
         }
@@ -232,6 +231,7 @@ struct ContentView: View {
 
 struct SettingsView: View {
     @ObservedObject var settings: SettingsManager
+    @ObservedObject var store: SolveStore
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -240,6 +240,17 @@ struct SettingsView: View {
                 Section("Feedback") {
                     Toggle("Haptic Feedback", isOn: $settings.isHapticsEnabled)
                     Toggle("Sound Effects", isOn: $settings.isSoundEnabled)
+                }
+                
+                Section("Data") {
+                    if !store.solves.isEmpty {
+                        ShareLink(item: store.generateCSV(), preview: SharePreview("CubeTimer_Solves.csv")) {
+                            Label("Export Solves (CSV)", systemImage: "square.and.arrow.up")
+                        }
+                    } else {
+                        Text("No data to export")
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
             .navigationTitle("Settings")
@@ -250,9 +261,16 @@ struct SettingsView: View {
     }
 }
 
-struct StatView: View {
+struct StatView<Accessory: View>: View {
     let label: String
     let value: Double?
+    let accessory: Accessory?
+
+    init(label: String, value: Double?, @ViewBuilder accessory: () -> Accessory?) {
+        self.label = label
+        self.value = value
+        self.accessory = accessory()
+    }
 
     var body: some View {
         VStack(spacing: 4) {
@@ -266,6 +284,12 @@ struct StatView: View {
         .padding()
         .background(Color(.secondarySystemBackground))
         .cornerRadius(12)
+        .overlay(alignment: .topTrailing) {
+            if let accessory = accessory {
+                accessory
+                    .padding(8)
+            }
+        }
     }
 
     func formatTime(_ time: Double) -> String {
@@ -278,3 +302,12 @@ struct StatView: View {
         return String(format: "%02d.%02d", seconds, centiseconds)
     }
 }
+
+extension StatView where Accessory == EmptyView {
+    init(label: String, value: Double?) {
+        self.label = label
+        self.value = value
+        self.accessory = nil
+    }
+}
+

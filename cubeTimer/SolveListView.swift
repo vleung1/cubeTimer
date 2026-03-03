@@ -54,9 +54,6 @@ struct SolveListView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
                         if !store.solves.isEmpty {
-                            ShareLink(item: store.generateCSV(), preview: SharePreview("CubeTimer_Solves.csv")) {
-                                Label("Export CSV", systemImage: "square.and.arrow.up")
-                            }
                             Button(role: .destructive, action: { showDeleteConfirm = true }) {
                                 Label("Delete All", systemImage: "trash")
                             }
