@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var store = SolveStore()
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var isRunning = false
     @State private var elapsedTime: Double = 0
     @State private var startTime: Date?
@@ -27,6 +28,7 @@ struct ContentView: View {
 
                 // Stats
                 HStack(spacing: 30) {
+                    StatView(label: "Best Time", value: store.bestTime)
                     StatView(label: "Overall Avg", value: store.overallAverage)
                     StatView(label: "Last 10 Avg", value: store.last10Average)
                 }
@@ -64,6 +66,10 @@ struct ContentView: View {
                     .foregroundColor(.secondary)
                     .padding(.bottom, 8)
                 }
+
+                // Progress Chart
+                ProgressChartView(solves: store.solves, average: store.overallAverage)
+                    .padding(.top, 8)
 
                 // Scrollable last 10 table
                 if !store.solves.isEmpty {
@@ -107,6 +113,11 @@ struct ContentView: View {
             .padding()
             .navigationTitle("Cube Timer")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { themeManager.cycleTheme() }) {
+                        Label(themeManager.label, systemImage: themeManager.iconName)
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showList = true }) {
                         Label("Solves", systemImage: "list.number")

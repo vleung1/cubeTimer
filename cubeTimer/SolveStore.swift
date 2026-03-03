@@ -37,6 +37,10 @@ class SolveStore: ObservableObject {
         return recent.map(\.time).reduce(0, +) / Double(recent.count)
     }
 
+    var bestTime: Double? {
+        solves.map(\.time).min()
+    }
+
     init() { load() }
 
     func addSolve(_ time: Double) {
