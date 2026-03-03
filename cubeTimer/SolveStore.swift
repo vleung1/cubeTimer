@@ -56,6 +56,16 @@ class SolveStore: ObservableObject {
         solves.removeAll()
     }
 
+    func generateCSV() -> String {
+        var csv = "Solve Number,Date,Time\n"
+        let dateFormatter = ISO8601DateFormatter()
+        for (index, solve) in solves.reversed().enumerated() {
+            let solveNum = solves.count - index
+            csv += "\(solveNum),\(dateFormatter.string(from: solve.date)),\(solve.time)\n"
+        }
+        return csv
+    }
+
     private func save() {
         if let data = try? JSONEncoder().encode(solves) {
             UserDefaults.standard.set(data, forKey: "solves")

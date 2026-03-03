@@ -6,15 +6,22 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct ContentView: View {
     @StateObject private var store = SolveStore()
+    @StateObject private var settings = SettingsManager()
     @EnvironmentObject var themeManager: ThemeManager
     @State private var isRunning = false
     @State private var elapsedTime: Double = 0
     @State private var startTime: Date?
     @State private var timer: Timer?
     @State private var showList = false
+    @State private var showSettings = false
+
+    private let audioSession = AVAudioSession.sharedInstance()
+    private let synthesizer = AVSpeechSynthesizer() // Placeholder or use AudioServices for beep
+
 
     let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -28,7 +35,15 @@ struct ContentView: View {
 
                 // Stats
                 HStack(spacing: 30) {
-                    StatView(label: "Best Time", value: store.bestTime)
+                    VStack {
+                        StatView(label: "Best Time", value: store.bestTime)
+                        if let best = store.bestTime {
+                            ShareLink(item: renderBestTime(best), preview: SharePreview("My Best Time", image: renderBestTime(best))) {
+                                Label("Share", systemImage: "square.and.arrow.up")
+                                    .font(.caption2)
+                            }
+                        }
+                    }
                     StatView(label: "Overall Avg", value: store.overallAverage)
                     StatView(label: "Last 10 Avg", value: store.last10Average)
                 }
@@ -119,13 +134,24 @@ struct ContentView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showList = true }) {
-                        Label("Solves", systemImage: "list.number")
+                    HStack {
+                        Button(action: { showSettings = true }) {
+                            Image(systemName: "gear")
+                        }
+                        Button(action: { showList = true }) {
+                            Label("Solves", systemImage: "list.number")
+                        }
                     }
                 }
             }
             .sheet(isPresented: $showList) {
                 SolveListView(store: store)
+                    .environmentObject(themeManager)
+                    .environmentObject(settings)
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView(settings: settings)
+                    .presentationDetents([.medium])
             }
         }
     }
@@ -134,9 +160,20 @@ struct ContentView: View {
         if isRunning {
             stopTimer()
             store.addSolve(elapsedTime)
+            
+            if settings.isHapticsEnabled {
+                HapticManager.shared.triggerImpact(.medium)
+            }
         } else {
             elapsedTime = 0
             startTimer()
+            
+            if settings.isHapticsEnabled {
+                HapticManager.shared.triggerImpact(.light)
+            }
+            if settings.isSoundEnabled {
+                AudioServicesPlaySystemSound(1103) // System beep
+            }
         }
     }
 
@@ -164,6 +201,52 @@ struct ContentView: View {
             return String(format: "%d:%02d.%02d", minutes, seconds, centiseconds)
         }
         return String(format: "%02d.%02d", seconds, centiseconds)
+    }
+
+    @MainActor
+    func renderBestTime(_ time: Double) -> Image {
+        let renderer = ImageRenderer(content: 
+            VStack(spacing: 20) {
+                Text("CUBE TIMER")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                Text("New Best Time!")
+                    .font(.title.bold())
+                Text(formatTime(time))
+                    .font(.system(size: 80, weight: .thin, design: .monospaced))
+                    .foregroundColor(.green)
+                Text(Date().formatted(date: .abbreviated, time: .shortened))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(40)
+            .background(Color(.systemBackground))
+        )
+        
+        if let uiImage = renderer.uiImage {
+            return Image(uiImage: uiImage)
+        }
+        return Image(systemName: "xmark")
+    }
+}
+
+struct SettingsView: View {
+    @ObservedObject var settings: SettingsManager
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Feedback") {
+                    Toggle("Haptic Feedback", isOn: $settings.isHapticsEnabled)
+                    Toggle("Sound Effects", isOn: $settings.isSoundEnabled)
+                }
+            }
+            .navigationTitle("Settings")
+            .toolbar {
+                Button("Done") { dismiss() }
+            }
+        }
     }
 }
 

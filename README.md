@@ -8,9 +8,12 @@ Cube Timer is a simple, intuitive iOS application built with SwiftUI designed fo
 - **Solve Statistics**: Automatically calculates and displays your **Best Time**, Overall Average, and Last 10 Solves Average.
 - **Progress Chart**: Visualize your improvement over time with a dynamic line chart (built with Swift Charts).
 - **Dark/Light Theme Toggle**: Switch between system, light, and dark modes directly within the app.
+- **Haptic & Sound Feedback**: Tactile and audible feedback when starting and stopping the timer (can be toggled in settings).
+- **CSV Export**: Export your entire solve history to a CSV file.
+- **Share Best Time**: Generate and share a "New Best Time!" card image.
 - **History Tracking**: Keeps a history of your past solves, displaying the last 10 solves on the main screen.
 - **Solve Management**: View your entire solve history in a separate list, with the ability to delete individual solves or reset all data.
-- **Persistent Storage**: All your solves, statistics, and theme preferences are saved automatically.
+- **Persistent Storage**: All your solves, statistics, theme preferences, and feedback settings are saved automatically.
 - **New App Icon**: Features a modern, vibrant 3D Rubik's cube design.
 
 ## Requirements
